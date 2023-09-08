@@ -49,7 +49,7 @@ dnf install --nogpgcheck --disablerepo=* ./umbrello-packages/* -y
 
 mkdir -p $PATH_DEST
 echo "Instalando Eclipse.."
-cp -r eclipse-packages/eclipse $PATH_DEST
+cp -r eclipse-packages/eclipse $PATH_DEST/
 echo "Cargando Lanzador Eclipse IDE"
 cp $PATH_DEST/eclipse/eclipse.desktop /usr/share/applications/
 echo "Preparando Android Studio"
