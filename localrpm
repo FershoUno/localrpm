@@ -1,0 +1,68 @@
+#!/bin/bash
+# Author: @FershoUno
+# License: GPLv3
+
+# VARIABLES
+PATH_PACKAGES="Fedora-Packages"
+URL_ECLIPSE="https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2023-06/R/eclipse-java-2023-06-R-linux-gtk-x86_64.tar.gz"
+URL_ANDROID_STUDIO="https://r5---sn-njaeyn7s.gvt1.com/edgedl/android/studio/ide-zips/2022.3.1.19/android-studio-2022.3.1.19-linux.tar.gz"
+
+
+# Crea directorios para almacenar las herramientas: lazarus, python3-qt5, umbrello, eclipse
+echo "Creando directorios lazarus-packages umbrello-packages eclipse-packages android-studio-packages en Fedora-Installer"
+sleep 2
+mkdir -p $PATH_PACKAGES/{lazarus-packages,umbrello-packages,eclipse-packages,android-studio-packages}
+
+
+# Descarga paquetes desde repositorios
+echo "Empezando a descargar los paquetes"
+dnf download --resolve --destdir=$PATH_PACKAGES/lazarus-packages lazarus -y
+dnf download --resolve --destdir=$PATH_PACKAGES/umbrello-packages umbrello -y
+
+# Leer el README para saber como actualizar la URL de descarga de Eclipse IDE
+# Descarga Eclipse IDE (Java incluido)
+wget -q $URL_ECLIPSE -O - | tar -xzvf - -C $PATH_PACKAGES/eclipse-packages
+
+# Generador de Lanzador para Eclipse IDE
+cat <<EOF > $PATH_PACKAGES/eclipse-packages/eclipse/eclipse.desktop
+[Desktop Entry]
+Name=Eclipse IDE
+Exec=/opt/NucleoLinuxUAGRM/eclipse/eclipse
+Icon=/opt/NucleoLinuxUAGRM/eclipse/icon.xpm
+Terminal=false
+Type=Application
+Categories=Development;
+EOF
+
+# Descarga Android Studio
+wget -q $URL_ANDROID_STUDIO -O - | tar -xzvf - -C $PATH_PACKAGES/android-studio-packages
+
+# Generador de script installer
+cat <<EOF > $PATH_PACKAGES/installer
+#!/bin/bash
+# Author: @FershoUno
+# License: GPLv3
+
+dnf install --nogpgcheck --disablerepo=* ./lazarus-packages/* -y
+dnf install --nogpgcheck --disablerepo=* ./umbrello-packages/* -y
+
+mkdir -p /opt/NucleoLinuxUAGRM
+echo "Instalando Eclipse.."
+cp -r eclipse-packages/eclipse /opt/NucleoLinuxUAGRM/
+echo "Cargando Lanzador Eclipse IDE"
+cp /opt/NucleoLinuxUAGRM/eclipse/eclipse.desktop /usr/share/applications/
+echo "Preparando Android Studio"
+cp -r android-studio-packages/android-studio /opt/NucleoLinuxUAGRM/
+
+chmod +x /opt/NucleoLinuxUAGRM/eclipse/eclipse
+chown -R $SUDO_USER:$SUDO_USER /opt/NucleoLinuxUAGRM
+
+echo -e "\nPara instalar Android Studio, ejecute ./studio.sh <<SIN ROOT>> en: /opt/NucleoLinuxUAGRM/android-studio \n"
+EOF
+
+
+#Comprimir Fedora-Packages con tar.gz
+echo "Empezando a comprimir con tar.gz"
+tar -czvf Fedora-Packages.tar.gz Fedora-Packages/
+
+echo -e "\n Se creo Fedora-Packages.tar.gz, finalizando! \n"
