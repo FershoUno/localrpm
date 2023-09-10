@@ -5,7 +5,6 @@
 # VARIABLES
 PATH_PACKAGES="Fedora-Packages"
 NAME_TAR="Fedora-Packages"
-PATH_DEST=/opt/NucleoLinuxUAGRM
 URL_ECLIPSE="https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2023-06/R/eclipse-java-2023-06-R-linux-gtk-x86_64.tar.gz"
 URL_ANDROID_STUDIO="https://r5---sn-njaeyn7s.gvt1.com/edgedl/android/studio/ide-zips/2022.3.1.19/android-studio-2022.3.1.19-linux.tar.gz"
 VERSION_FEDORA="-38"
@@ -45,6 +44,8 @@ cat <<EOF > $PATH_PACKAGES$VERSION_FEDORA/installer
 # Author: @FershoUno
 # License: GPLv3
 
+PATH_DEST="/opt/NucleoLinuxUAGRM"
+
 dnf install --nogpgcheck --disablerepo=* ./lazarus-packages/* -y
 dnf install --nogpgcheck --disablerepo=* ./umbrello-packages/* -y
 
@@ -58,7 +59,6 @@ cp -r android-studio-packages/android-studio $PATH_DEST/
 
 chmod +x $PATH_DEST/eclipse/eclipse
 chown -R $SUDO_USER:$SUDO_USER $PATH_DEST
-
 sudo -u $SUDO_USER $PATH_DEST/android-studio/bin/studio.sh
 
 EOF
