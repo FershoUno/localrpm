@@ -1,49 +1,49 @@
 # localrpm
 
-localrpm permite descargar los paquetes y dependencias tomando una lista de software para empaquetarlos y tenerlo de manera **"OffLine"**
+localrpm allows you to download packages and dependencies based on a software list to package then and have them available **"OffLine"**
 
-## Dependencias
+## Dependencies
 
 - dnf-plugin-core  
-como instalar: `dnf install dnf-plugin-core`
-> Nota.- Fedora lo tiene "pre-instalado"
+how to install: `dnf install dnf-plugin-core`
+> Note.- Fedora hast it "pre-installed"
 
-## Lista de herramientas
+## List of Tools
 
-Para agregar una lista de herramientas es necesario modificar la lista que existe dentro del archivo `localrpm`   , ejemplo:
+To add a list of tools, it is necessary to modify the list inside the `localrpm` file, for example:
 
     LIST_PACKAGES=()  
    
-se modifica de la siguiente manera:     
+it is modified as follows:     
     
     LIST_PACKAGES=(lazarus umbrello htop)
-> El orden de instalación de los paquetes rpm va ser el mismo orden creciente de la lista ej: lazarus umbrello htop  
+> The order of installation of the rpm packages will be the same increasing order of the list, e.g., lazarus umbrello htop
 
     1.- lazarus  
     2.- umbrello  
     3.- htop
 
-## Como ejecutar
+## How to Run
 
-Una vez que se haya agregado la lista de herramientas, se debe ejecutar el script `localrpm` :
+Once the list of tools has been added, the `localrpm` script must be executed:
 
     sudo ./localrpm
 
-## Instalación Offline
+## Offline Installation
 
-Para realizar la instalación, se tiene que seguir las siguientes instrucciones: 
+To perform the installation, you hace to follow the instructions below:
 
-> cambiar el * por la versión que se haya generado el tar.gz  
+> replace * with the version that the tar.gz has been generated  
 
     tar -xzvf Fedora-Packages-*.tar.gz
     sudo -s
     cd Fedora-Packages-*
     bash installer   
 
-## Importante!
+## Important!
 
-Este script se debe ejecutar en una nueva instalación de Fedora para evitar conflictos de dependencias con las herramientas que se planea descargar e instalar de manera Offline.  
+This script should be run on a fresh Fedora installation to avoid dependecy conflicts with the tools planned to be downloaded and installed offline.  
 
-Tomar en cuenta que el script no elimina el directorio, esto es para que se pueda volver a empaquetar si en caso requiere alguna modificación y/o adición personal
+Please note that the script does not delete the directory, this is so it can be repackaged if any modification and/or personal addition is required.  
 
     tar -czvf Fedora-Packages-*.gz Fedora-Packages-*/
