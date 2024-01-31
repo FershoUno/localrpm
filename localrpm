@@ -2,69 +2,43 @@
 # Author: @FershoUno
 # License: GPLv3
 
+# Lista de Paquetes desde RPM
+LIST_PACKAGES=()
+
 # VARIABLES
 PATH_PACKAGES="Fedora-Packages"
 NAME_TAR="Fedora-Packages"
-URL_ECLIPSE="https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2023-06/R/eclipse-java-2023-06-R-linux-gtk-x86_64.tar.gz"
-URL_ANDROID_STUDIO="https://r5---sn-njaeyn7s.gvt1.com/edgedl/android/studio/ide-zips/2022.3.1.19/android-studio-2022.3.1.19-linux.tar.gz"
-VERSION_FEDORA="-38"
 
-# Crea directorios para almacenar las herramientas: lazarus, python3-qt5, umbrello, eclipse
-echo "Creando directorios lazarus-packages umbrello-packages eclipse-packages android-studio-packages en Fedora-Installer"
-sleep 2
-mkdir -p $PATH_PACKAGES$VERSION_FEDORA/{lazarus-packages,umbrello-packages,eclipse-packages,android-studio-packages}
+# Obtiene la versión de Fedora que esta instalado
+VERSION_FEDORA="-$(cat /etc/os-release | grep -i VERSION_ID | cut -d "=" -f 2)"
+echo -e "\n Version de Fedora: $VERSION_FEDORA \n"
 
-
-# Descarga paquetes desde repositorios
-echo "Empezando a descargar los paquetes"
-dnf download --resolve --destdir=$PATH_PACKAGES$VERSION_FEDORA/lazarus-packages lazarus -y
-dnf download --resolve --destdir=$PATH_PACKAGES$VERSION_FEDORA/umbrello-packages umbrello -y
-
-# Leer el README para saber como actualizar la URL de descarga de Eclipse IDE
-# Descarga Eclipse IDE (Java incluido)
-wget -q $URL_ECLIPSE -O - | tar -xzvf - -C $PATH_PACKAGES$VERSION_FEDORA/eclipse-packages
-
-# Generador de Lanzador para Eclipse IDE
-cat <<EOF > $PATH_PACKAGES/eclipse-packages/eclipse/eclipse.desktop
-[Desktop Entry]
-Name=Eclipse IDE
-Exec=/opt/NucleoLinuxUAGRM/eclipse/eclipse
-Icon=/opt/NucleoLinuxUAGRM/eclipse/icon.xpm
-Terminal=false
-Type=Application
-Categories=Development;
-EOF
-
-# Descarga Android Studio
-wget -q $URL_ANDROID_STUDIO -O - | tar -xzvf - -C $PATH_PACKAGES$VERSION_FEDORA/android-studio-packages
+for i in "${LIST_PACKAGES[@]}"; do
+    echo -e "\n Preparando el paquete $i \n"
+    mkdir -p $PATH_PACKAGES$VERSION_FEDORA/$i-packages
+    dnf download --resolve --destdir=$PATH_PACKAGES$VERSION_FEDORA/$i-packages $i -y
+    echo -e "\n Paquete $i Descargado \n"
+done
 
 # Generador de script installer
-cat <<EOF > $PATH_PACKAGES$VERSION_FEDORA/installer
-#!/bin/bash
+echo "#!/bin/bash
 # Author: @FershoUno
 # License: GPLv3
 
-PATH_DEST="/opt/NucleoLinuxUAGRM"
+# Instalador de paquetes RPM
+LIST_PACKAGES_RPM=("${LIST_PACKAGES[@]}")
 
-dnf install --nogpgcheck --disablerepo=* ./lazarus-packages/* -y
-dnf install --nogpgcheck --disablerepo=* ./umbrello-packages/* -y
+for i in \"\${LIST_PACKAGES_RPM[@]}\"
+do
+    echo -e \"\n Instalando Paquete \$i \n\"
+    dnf install --nogpgcheck --disablerepo=* ./\$i-packages/* -y
+    echo -e \"\n Se terminó de instalar \$i \n\"
+done
+" > $PATH_PACKAGES$VERSION_FEDORA/installer
 
-mkdir -p $PATH_DEST/
-echo "Instalando Eclipse.."
-cp -r eclipse-packages/eclipse $PATH_DEST/
-echo "Cargando Lanzador Eclipse IDE"
-cp $PATH_DEST/eclipse/eclipse.desktop /usr/share/applications/
-echo "Preparando Android Studio"
-cp -r android-studio-packages/android-studio $PATH_DEST/
-
-chmod +x $PATH_DEST/eclipse/eclipse
-chown -R $SUDO_USER:$SUDO_USER $PATH_DEST
-sudo -u $SUDO_USER $PATH_DEST/android-studio/bin/studio.sh
-
-EOF
 
 #Comprimir Fedora-Packages con tar.gz
-echo "Empezando a comprimir con tar.gz"
+echo "Creando compresión $NAME_TAR$VERSION_FEDORA.tar.gz"
 tar -czvf $NAME_TAR$VERSION_FEDORA.tar.gz $PATH_PACKAGES$VERSION_FEDORA/
 
 echo -e "\n Se creo $NAME_TAR$VERSION_FEDORA.tar.gz, finalizando! \n"
