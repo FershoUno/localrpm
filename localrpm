@@ -2,43 +2,42 @@
 # Author: @FershoUno
 # License: GPLv3
 
-# Lista de Paquetes desde RPM
+# List of Packages from RPM
 LIST_PACKAGES=()
 
 # VARIABLES
 PATH_PACKAGES="Fedora-Packages"
 NAME_TAR="Fedora-Packages"
 
-# Obtiene la versión de Fedora que esta instalado
+# Gets the installed Fedora version
 VERSION_FEDORA="-$(cat /etc/os-release | grep -i VERSION_ID | cut -d "=" -f 2)"
-echo -e "\n Version de Fedora: $VERSION_FEDORA \n"
+echo -e "\n Fedora Version: $VERSION_FEDORA \n"
 
 for i in "${LIST_PACKAGES[@]}"; do
-    echo -e "\n Preparando el paquete $i \n"
+    echo -e "\n Preparing package $i \n"
     mkdir -p $PATH_PACKAGES$VERSION_FEDORA/$i-packages
     dnf download --resolve --destdir=$PATH_PACKAGES$VERSION_FEDORA/$i-packages $i -y
-    echo -e "\n Paquete $i Descargado \n"
+    echo -e "\n Package $i downloaded \n"
 done
 
-# Generador de script installer
+# Installer script generator
 echo "#!/bin/bash
 # Author: @FershoUno
 # License: GPLv3
 
-# Instalador de paquetes RPM
+# RPM Package installer
 LIST_PACKAGES_RPM=("${LIST_PACKAGES[@]}")
 
 for i in \"\${LIST_PACKAGES_RPM[@]}\"
 do
-    echo -e \"\n Instalando Paquete \$i \n\"
+    echo -e \"\n Installing Package \$i \n\"
     dnf install --nogpgcheck --disablerepo=* ./\$i-packages/* -y
-    echo -e \"\n Se terminó de instalar \$i \n\"
+    echo -e \"\n \$i installation completed \n\"
 done
 " > $PATH_PACKAGES$VERSION_FEDORA/installer
 
-
-#Comprimir Fedora-Packages con tar.gz
-echo "Creando compresión $NAME_TAR$VERSION_FEDORA.tar.gz"
+# Compress Fedora-Packages with tar.gz
+echo "Creating compression $NAME_TAR$VERSION_FEDORA.tar.gz"
 tar -czvf $NAME_TAR$VERSION_FEDORA.tar.gz $PATH_PACKAGES$VERSION_FEDORA/
 
-echo -e "\n Se creo $NAME_TAR$VERSION_FEDORA.tar.gz, finalizando! \n"
+echo -e "\n $NAME_TAR$VERSION_FEDORA.tar.gz created, finishing! \n"
