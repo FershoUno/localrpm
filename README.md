@@ -4,11 +4,16 @@ localrpm allows you to download packages and dependencies based on a software li
 
 ## Dependencies
 
-- dnf-plugin-core  
-how to install: `dnf install dnf-plugin-core`
-> Note.- Fedora hast it "pre-installed"
+This dependency comes pre-installed on Fedora Workstation
 
-## List of Tools
+- dnf-plugin-core  
+
+how to install:  
+
+    dnf install dnf-plugin-core  
+> Note.- Note: If you want to use a Fedora LXC container, then you need to install it.
+
+## List of tools
 
 To add a list of tools, it is necessary to modify the list inside the `localrpm` file, for example:
 
@@ -33,17 +38,13 @@ Once the list of tools has been added, the `localrpm` script must be executed:
 
 To perform the installation, you hace to follow the instructions below:
 
-> replace * with the version that the tar.gz has been generated  
-
-    tar -xzvf Fedora-Packages-*.tar.gz
+    tar -xzvf fedora-packages-*.tar.gz
     sudo -s
-    cd Fedora-Packages-*
+    cd fedora-packages-*/
     bash installer   
 
 ## Important!
 
-This script should be run on a fresh Fedora installation to avoid dependecy conflicts with the tools planned to be downloaded and installed offline.  
-
-Please note that the script does not delete the directory, this is so it can be repackaged if any modification and/or personal addition is required.  
-
-    tar -czvf Fedora-Packages-*.gz Fedora-Packages-*/
+This tool is designed to work correctly on new Fedora installations. Some activities where this tool may be useful:
+- Post FLISOL
+- InstallFest at the university 

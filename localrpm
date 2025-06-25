@@ -5,22 +5,19 @@
 # List of Packages from RPM
 LIST_PACKAGES=()
 
-# VARIABLES
-PATH_PACKAGES="Fedora-Packages"
-NAME_TAR="Fedora-Packages"
 
-# Gets the installed Fedora version
-VERSION_FEDORA="-$(cat /etc/os-release | grep -i VERSION_ID | cut -d "=" -f 2)"
-echo -e "\n Fedora Version: $VERSION_FEDORA \n"
+VERSION="$(cat /etc/os-release | grep -i VERSION_ID | cut -d "=" -f 2)"
+echo -e "\n Fedora Version: $VERSION \n"
 
-for i in "${LIST_PACKAGES[@]}"; do
-    echo -e "\n Preparing package $i \n"
-    mkdir -p $PATH_PACKAGES$VERSION_FEDORA/$i-packages
-    dnf download --resolve --destdir=$PATH_PACKAGES$VERSION_FEDORA/$i-packages $i -y
-    echo -e "\n Package $i downloaded \n"
+PATH_PACKAGES="fedora-packages-$VERSION"
+
+for PACKAGE in "${LIST_PACKAGES[@]}"; do
+    echo -e "\n Preparing package $PACKAGE \n"
+    mkdir -p $PATH_PACKAGES/${PACKAGE}
+    dnf download --resolve --destdir=$PATH_PACKAGES/${PACKAGE} ${PACKAGE} -y
+    echo -e "\n Package ${PACKAGE} downloaded \n"
 done
 
-# Installer script generator
 echo "#!/bin/bash
 # Author: @FershoUno
 # License: GPLv3
@@ -28,16 +25,15 @@ echo "#!/bin/bash
 # RPM Package installer
 LIST_PACKAGES_RPM=("${LIST_PACKAGES[@]}")
 
-for i in \"\${LIST_PACKAGES_RPM[@]}\"
+for PACKAGE in \"\${LIST_PACKAGES_RPM[@]}\"
 do
-    echo -e \"\n Installing Package \$i \n\"
-    dnf install --nogpgcheck --disablerepo=* ./\$i-packages/* -y
-    echo -e \"\n \$i installation completed \n\"
+    echo -e \"\n Installing Package \${PACKAGE} \n\"
+    dnf install --nogpgcheck --disablerepo=* ./\${PACKAGE}/* -y
+    echo -e \"\n \${PACKAGE} installation completed \n\"
 done
-" > $PATH_PACKAGES$VERSION_FEDORA/installer
+" > $PATH_PACKAGES/installer
 
-# Compress Fedora-Packages with tar.gz
-echo "Creating compression $NAME_TAR$VERSION_FEDORA.tar.gz"
-tar -czvf $NAME_TAR$VERSION_FEDORA.tar.gz $PATH_PACKAGES$VERSION_FEDORA/
+echo "Creating compression $PATH_PACKAGES.tar.gz"
+tar -czvf $PATH_PACKAGES.tar.gz $PATH_PACKAGES/
 
-echo -e "\n $NAME_TAR$VERSION_FEDORA.tar.gz created, finishing! \n"
+echo -e "\n $PATH_PACKAGES.tar.gz created, finishing! \n"
