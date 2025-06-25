@@ -32,7 +32,7 @@ it is modified as follows:
 
 Once the list of tools has been added, the `localrpm` script must be executed:
 
-    sudo ./localrpm
+    sudo bash localrpm
 
 ## Offline Installation
 
@@ -42,6 +42,8 @@ To perform the installation, you hace to follow the instructions below:
     sudo -s
     cd fedora-packages-*/
     bash installer   
+
+> Note.- You need to run this as **superuser**.
 
 ## Important!
 
